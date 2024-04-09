@@ -3,8 +3,9 @@ package bak
 import (
 	"context"
 	"fmt"
-	"github.com/redis/go-redis/v9"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 // host=11.0.1.152,port=6380,db=3
