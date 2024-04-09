@@ -16,7 +16,7 @@ func main() {
 	// addr :="192.168.1.222:6379"
 	// db := 1
 
-	addr :="127.0.0.1:6380"
+	addr := "127.0.0.1:6380"
 	db := 3
 
 	startTimestamp := time.Now().Unix()
@@ -42,13 +42,13 @@ func main() {
 
 	fileScanner := bufio.NewScanner(f_handle)
 
-	for fileScanner.Scan(){
-		line :=fileScanner.Text()
+	for fileScanner.Scan() {
+		line := fileScanner.Text()
 		if line == "" {
 			break
 		}
 		str_arr := strings.Split(string(line), `,`)
-		if len(str_arr)==0 {
+		if len(str_arr) == 0 {
 			fmt.Printf("strings.Split empry, :%s\r\n", time.Now())
 			break
 		}

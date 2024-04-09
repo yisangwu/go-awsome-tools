@@ -14,7 +14,7 @@ func main() {
 	// addr :="192.168.1.222:6379"
 	// db := 1
 
-	addr :="127.0.0.1:6380"
+	addr := "127.0.0.1:6380"
 	db := 3
 
 	startTimestamp := time.Now().Unix()
