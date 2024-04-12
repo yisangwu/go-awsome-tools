@@ -1,3 +1,4 @@
 !.gitignore
 !build.bat
 !cmd_build
+*
