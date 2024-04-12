@@ -198,6 +198,7 @@ func SelectFromTableMarshalToFile(conn *gorm.DB){
 
 
 // go run .\QuizeCsvImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
+// xx.txt ： Qual é a dança da paixão nacional do Brasil?	tango	Samba	2	2
 func main() {
     flag.Parse()
     if h {
