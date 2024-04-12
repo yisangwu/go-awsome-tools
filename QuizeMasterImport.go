@@ -23,32 +23,40 @@ var (
     db_password string
     database string
     table string
+    genx bool
     file_name   string
 )
 
 func init() {
+    // 定义命令行参数
     flag.BoolVar(&h, "h", false, "show help")
-    flag.StringVar(&db_host, "db_host", "localhost", "databse host")
+    flag.StringVar(&db_host, "db_host", "", "databse host")
     flag.IntVar(&db_port, "db_port", 3306, "databse port")
-    flag.StringVar(&db_user, "db_user", "root", "databse user")
-    flag.StringVar(&db_password, "db_password", "123456", "databse db_password")
-    flag.StringVar(&database, "database", "test", "databse name")
-    flag.StringVar(&table, "table", "test", "table name")
-    flag.StringVar(&file_name, "file_name", "xx.csv", "In the current directory, file name")
+    flag.StringVar(&db_user, "db_user", "", "databse user")
+    flag.StringVar(&db_password, "db_password", "", "databse db_password")
+    flag.StringVar(&database, "database", "", "databse name")
+    flag.StringVar(&table, "table", "", "table name")
+    flag.BoolVar(&genx, "genx", false, "only gen json file")
+    flag.StringVar(&file_name, "file_name", "", "In the current directory, file name")
 
-    flag.Usage = usage
-}
-
-func usage() {
-    fmt.Fprintf(os.Stderr, `
-Analyze question bank files and write them to the database
-Usage: QuizeCsvImport -db_host aaa / --db_host aaa / -db_host=aaa / --database=aaaa
-
-Options:
+    // 自定义帮助信息
+    flag.Usage = func () {
+        
+        fmt.Fprintf(os.Stderr, "Analyze question bank files and write them to the database\r\n")
+        fmt.Fprintf(os.Stderr, "Usage: \r\n")
+        fmt.Fprintf(os.Stderr, `    Export and gen file: QuizeCsvImport -db_host="localhost" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
 `)
-    flag.PrintDefaults()
+        fmt.Fprint(os.Stderr, `    Only gen file: QuizeCsvImport -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -genx=true
+`)
+        fmt.Fprintf(os.Stderr, "Options:\r\n")
+        flag.PrintDefaults()
+    }
+    // 解析命令行参数
+    flag.Parse()
+
 }
 
+// 从model 生成 orm
 func GenModel(con *gorm.DB, table string) {
     g := gen.NewGenerator(gen.Config{
         OutPath: "models",
@@ -64,10 +72,10 @@ func GenModel(con *gorm.DB, table string) {
 }
 
 
+// 解析题库
 func ParseQuizeFile(filename string) []*model.QuestionBank{
 
     quize:= []*model.QuestionBank{}
-
     f_handle, err := os.Open(filename)
     if err!=nil{
         fmt.Printf("open file failed, filename:%s, err:%+v", filename, err)
@@ -103,7 +111,7 @@ type JsonDataStruct struct {
     CorrectAnswer int    `json:"correct_answer"`
 }
 
-
+// 解析题库并写入json文件
 func ParseQuizeFileToJson(filename string)  {
     
     f_handle, err := os.Open(filename)
@@ -142,7 +150,7 @@ func ParseQuizeFileToJson(filename string)  {
     }
 }
 
-
+// 从DB中查询题库并写入json文件
 func SelectFromTableMarshalToFile(conn *gorm.DB){
     
     question_bank := []model.QuestionBank{}
@@ -156,17 +164,17 @@ func SelectFromTableMarshalToFile(conn *gorm.DB){
 ["Id", "languageID", "questionKey", "option1Key", "option2Key", "answerKey", "answerID"],
 ["int", "int", "string", "string", "string", "string", "int"],
 ["题目id","所属语言id", "问题", "选项1", "选项2", "答案", "答案id"],`+"\n"
-    quize_arr := []JsonDataStruct{}
+
+    // quize_arr := []JsonDataStruct{}
     len_bank := len(question_bank)
     for i, item := range question_bank{
-        fmt.Println(item.LangID)
-        quize_arr = append(quize_arr, JsonDataStruct{
-            LangID: int(item.LangID),
-            Question: item.Question,
-            Option1: item.Option1,
-            Option2: item.Option2,
-            CorrectAnswer: int(item.CorrectAnswer),
-        } )
+        // quize_arr = append(quize_arr, JsonDataStruct{
+        //     LangID: int(item.LangID),
+        //     Question: item.Question,
+        //     Option1: item.Option1,
+        //     Option2: item.Option2,
+        //     CorrectAnswer: int(item.CorrectAnswer),
+        // } )
 
         jsonStr, _ := json.Marshal([]string{
             strconv.Itoa(int(item.ID)), 
@@ -182,46 +190,140 @@ func SelectFromTableMarshalToFile(conn *gorm.DB){
             xx += string(jsonStr) + "\n"
         }
     }
-    xxxx, _ := json.Marshal(quize_arr)
-    fmt.Println(string(xxxx))
+    // xxxx, _ := json.Marshal(quize_arr)
+    // fmt.Println(string(xxxx))
    
     xx = strings.TrimRight(xx, ",")
     xx += "]"
-    fmt.Println(string(xx))
 
     if err := os.WriteFile("questions.json", []byte(xx), 0666); err != nil {
         fmt.Printf("SelectFromTableMarshalToFile WriteFile failed, err:%+v", err)
         return
     }
-
+    fmt.Printf("Gen json file name:%s\r\n", "questions.json")
 }
 
 
+
 // go run .\QuizeCsvImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
+// -db_host aaa / --db_host aaa / -db_host=aaa / --database=aaaa
 // xx.txt ： Qual é a dança da paixão nacional do Brasil?	tango	Samba	2	2
-func main() {
-    flag.Parse()
-    if h {
-        flag.Usage()
+func main_one() {
+    dbHostPtr := flag.String("db_host", "localhost", "databse host")
+    dbPortPtr := flag.Int("db_port", 3306, "databse port")
+    dbUserPtr := flag.String("db_user", "", "databse user")
+    dbPasswordPtr := flag.String("db_password", "", "databse db_password")
+    dbPtr :=flag.String("database", "", "databse name")
+    tablePtr := flag.String("table", "", "table name")
+    fileNamePtr:=flag.String("file_name", "", "In the current directory, file name")
+
+    // 自定义帮助信息
+    flag.Usage = func () {
+        fmt.Fprintf(os.Stderr, "Analyze question bank files and write them to the database\r\n")
+        fmt.Fprintf(os.Stderr, "Usage: \r\n")
+        fmt.Fprintf(os.Stderr, `    QuizeCsvImport -db_host="localhost" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
+`)
+        fmt.Fprintf(os.Stderr, "Options:\r\n")
+        flag.PrintDefaults()
     }
-    dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", db_user, db_password, db_host, db_port, database)
-    fmt.Printf("dsn:%s", dsn)
+    // 解析命令行参数
+    flag.Parse()
+
+    // 如果没有提供任何命令行参数，则打印帮助信息
+    if flag.NFlag() == 0{
+        flag.Usage()
+        return
+    }
+    if *dbHostPtr == "" || *dbUserPtr == "" || *dbPasswordPtr == "" || *dbPtr == "" || *tablePtr == "" || *fileNamePtr == "" {
+        fmt.Println("Error! All args must have values")
+        flag.Usage()
+        return
+    }
+    dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", *dbUserPtr, *dbPasswordPtr, *dbHostPtr, *dbPortPtr, *dbPtr)
+    fmt.Printf("check dsn:%s\r\n", dsn)
 
     conn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
     if err != nil{
-        fmt.Printf("connect database failed, err:%+v", err)
+        fmt.Printf("Error! Connect database failed, err:%+v\r\n", err)
         os.Exit(1)
     }
-    // GenModel(conn, table)
+    // 生成orm
+    // GenModel(conn, *tablePtr)
 
-    // bluckModels := ParseQuizeFile(file_name)
+    // 解析题库文件，并写入DB
+    // bluckModels := ParseQuizeFile(*fileNamePtr)
     // if len(bluckModels)==0 {
-    //     fmt.Printf("ParseQuizeFile return empry, csv_file:%+v", file_name)
+    //     fmt.Printf("ParseQuizeFile return empry, csv_file:%+v", *fileNamePtr)
     //     os.Exit(1)
     // }
     // result := conn.Create(bluckModels)
     // fmt.Printf("create result:%+v", result)
     
-    //ParseQuizeFileToJson(file_name)
+    // 解析题库文件，生成json文件
+    //ParseQuizeFileToJson(*fileNamePtr)
+    
+    // 从DB题库表查询所有，并生成json文件
     SelectFromTableMarshalToFile(conn)
+}
+
+
+// go run .\QuizeCsvImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
+// -db_host aaa / --db_host aaa / -db_host=aaa / --database=aaaa
+// xx.txt ： Qual é a dança da paixão nacional do Brasil?	tango	Samba	2	2
+func main() {
+    // 如果没有提供任何命令行参数，则打印帮助信息
+    if flag.NFlag() == 0{
+        flag.Usage()
+        return
+    }
+    if db_host == "" || db_user == "" || db_password == "" || database == "" || table == "" {
+        fmt.Println("Error! All args must have values")
+        flag.Usage()
+        return
+    }
+
+    if !genx && file_name== "" {
+        fmt.Println("Error! file_name must have values")
+        flag.Usage()
+        return
+    }
+
+    dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", db_user, db_password, db_host, db_port, database)
+    fmt.Printf("check dsn:%s\r\n", dsn)
+
+    conn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    if err != nil{
+        fmt.Printf("Error! Connect database failed, err:%+v\r\n", err)
+        os.Exit(1)
+    }
+    // 生成orm
+    // GenModel(conn, table)
+
+    if genx {
+        // 从DB题库表查询所有，并生成json文件
+        SelectFromTableMarshalToFile(conn)
+        fmt.Println("Successfully generated JSON file")
+        return 
+    }
+
+    //解析题库文件，并写入DB
+    bluckModels := ParseQuizeFile(file_name)
+    if len(bluckModels)==0 {
+        fmt.Printf("ParseQuizeFile return empry, csv_file:%+v\r\n", file_name)
+        return
+    }
+    result := conn.Create(bluckModels)
+    if result.Error != nil {
+        fmt.Printf("create result:%+v\r\n", result)
+        return
+    }
+    fmt.Println("Successfully batch written to db")
+
+    // // 生成json文件
+    // ParseQuizeFileToJson(file_name)
+    // fmt.Println("Successfully generated JSON file")
+
+    // 从DB题库表查询所有，并生成json文件
+    SelectFromTableMarshalToFile(conn)
+    fmt.Println("Successfully generated JSON file")
 }
