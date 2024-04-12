@@ -151,9 +151,14 @@ func SelectFromTableMarshalToFile(conn *gorm.DB){
         fmt.Printf("select failed, err:%+v", allData.Error)
         return
     }
-    xx := "["+ "\n"
+    xx := `[
+["题库信息总表"],
+["Id", "languageID", "questionKey", "option1Key", "option2Key", "answerKey", "answerID"],
+["int", "int", "string", "string", "string", "string", "int"],
+["题目id","所属语言id", "问题", "选项1", "选项2", "答案", "答案id"],`+"\n"
     quize_arr := []JsonDataStruct{}
-    for _, item := range question_bank{
+    len_bank := len(question_bank)
+    for i, item := range question_bank{
         fmt.Println(item.LangID)
         quize_arr = append(quize_arr, JsonDataStruct{
             LangID: int(item.LangID),
@@ -162,7 +167,7 @@ func SelectFromTableMarshalToFile(conn *gorm.DB){
             Option2: item.Option2,
             CorrectAnswer: int(item.CorrectAnswer),
         } )
-        
+
         jsonStr, _ := json.Marshal([]string{
             strconv.Itoa(int(item.ID)), 
             strconv.Itoa(int(item.LangID)), 
@@ -171,13 +176,19 @@ func SelectFromTableMarshalToFile(conn *gorm.DB){
             item.Option2, 
             strconv.Itoa(int(item.CorrectAnswer)),
         })
-
-        xx = xx + string(jsonStr) + "\n"
+        if (len_bank -i ) >1 {
+            xx += string(jsonStr) + ",\n"
+        }else{
+            xx += string(jsonStr) + "\n"
+        }
     }
     xxxx, _ := json.Marshal(quize_arr)
     fmt.Println(string(xxxx))
-    
+   
+    xx = strings.TrimRight(xx, ",")
     xx += "]"
+    fmt.Println(string(xx))
+
     if err := os.WriteFile("questions.json", []byte(xx), 0666); err != nil {
         fmt.Printf("SelectFromTableMarshalToFile WriteFile failed, err:%+v", err)
         return
