@@ -44,9 +44,9 @@ func init() {
         
         fmt.Fprintf(os.Stderr, "Analyze question bank files and write them to the database\r\n")
         fmt.Fprintf(os.Stderr, "Usage: \r\n")
-        fmt.Fprintf(os.Stderr, `    Export and gen file: QuizeCsvImport -db_host="localhost" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
+        fmt.Fprintf(os.Stderr, `    Export and gen file: QuizeMasterImport -db_host="localhost" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
 `)
-        fmt.Fprint(os.Stderr, `    Only gen file: QuizeCsvImport -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -genx=true
+        fmt.Fprint(os.Stderr, `    Only gen file: QuizeMasterImport -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -genx=true
 `)
         fmt.Fprintf(os.Stderr, "Options:\r\n")
         flag.PrintDefaults()
@@ -205,69 +205,7 @@ func SelectFromTableMarshalToFile(conn *gorm.DB){
 
 
 
-// go run .\QuizeCsvImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
-// -db_host aaa / --db_host aaa / -db_host=aaa / --database=aaaa
-// xx.txt ： Qual é a dança da paixão nacional do Brasil?	tango	Samba	2	2
-func main_one() {
-    dbHostPtr := flag.String("db_host", "localhost", "databse host")
-    dbPortPtr := flag.Int("db_port", 3306, "databse port")
-    dbUserPtr := flag.String("db_user", "", "databse user")
-    dbPasswordPtr := flag.String("db_password", "", "databse db_password")
-    dbPtr :=flag.String("database", "", "databse name")
-    tablePtr := flag.String("table", "", "table name")
-    fileNamePtr:=flag.String("file_name", "", "In the current directory, file name")
-
-    // 自定义帮助信息
-    flag.Usage = func () {
-        fmt.Fprintf(os.Stderr, "Analyze question bank files and write them to the database\r\n")
-        fmt.Fprintf(os.Stderr, "Usage: \r\n")
-        fmt.Fprintf(os.Stderr, `    QuizeCsvImport -db_host="localhost" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
-`)
-        fmt.Fprintf(os.Stderr, "Options:\r\n")
-        flag.PrintDefaults()
-    }
-    // 解析命令行参数
-    flag.Parse()
-
-    // 如果没有提供任何命令行参数，则打印帮助信息
-    if flag.NFlag() == 0{
-        flag.Usage()
-        return
-    }
-    if *dbHostPtr == "" || *dbUserPtr == "" || *dbPasswordPtr == "" || *dbPtr == "" || *tablePtr == "" || *fileNamePtr == "" {
-        fmt.Println("Error! All args must have values")
-        flag.Usage()
-        return
-    }
-    dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", *dbUserPtr, *dbPasswordPtr, *dbHostPtr, *dbPortPtr, *dbPtr)
-    fmt.Printf("check dsn:%s\r\n", dsn)
-
-    conn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-    if err != nil{
-        fmt.Printf("Error! Connect database failed, err:%+v\r\n", err)
-        os.Exit(1)
-    }
-    // 生成orm
-    // GenModel(conn, *tablePtr)
-
-    // 解析题库文件，并写入DB
-    // bluckModels := ParseQuizeFile(*fileNamePtr)
-    // if len(bluckModels)==0 {
-    //     fmt.Printf("ParseQuizeFile return empry, csv_file:%+v", *fileNamePtr)
-    //     os.Exit(1)
-    // }
-    // result := conn.Create(bluckModels)
-    // fmt.Printf("create result:%+v", result)
-    
-    // 解析题库文件，生成json文件
-    //ParseQuizeFileToJson(*fileNamePtr)
-    
-    // 从DB题库表查询所有，并生成json文件
-    SelectFromTableMarshalToFile(conn)
-}
-
-
-// go run .\QuizeCsvImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
+// go run .\QuizeMasterImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
 // -db_host aaa / --db_host aaa / -db_host=aaa / --database=aaaa
 // xx.txt ： Qual é a dança da paixão nacional do Brasil?	tango	Samba	2	2
 func main() {
