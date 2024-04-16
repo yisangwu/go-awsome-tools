@@ -10,7 +10,7 @@ echo now the GOOS:
 echo now the GOARCH:
  go env GOARCH
 
-go build -o bin/QuizeMasterImport
+go build -o bin/RedisKeyExport
 
 SET CGO_ENABLED=1
 SET GOARCH=amd64
