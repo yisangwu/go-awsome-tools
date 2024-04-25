@@ -1,0 +1,24 @@
+redis:
+  host: 192.168.1.222
+  port: 6379
+  db: 3
+
+  key_source_timestamp_txt: RRRR_REC_POPULAR_SENSITIVE_TXT
+  key_like_score_txt: RRRR_REC_LIKE_SCORE_TXT
+
+  key_source_timestamp_short_video: RRRR_REC_SENSITIVE_SHORT_VIDEO
+  key_like_score_short_video: RRRR_REC_LIKE_SCORE_SHORT_VIDEO
+
+  key_source_timestamp_video: RRRR_REC_POPULAR_SENSITIVE_VIDEO
+  key_like_score_video: RRRR_REC_LIKE_SCORE_VIDEO
+
+
+mysql:
+  host: 192.168.1.222
+  port: 3306
+  user: admin
+  password: admin
+  db: read_news
+  table_news_love: news_love
+  table_news_extra: news_newsdataextra
+
