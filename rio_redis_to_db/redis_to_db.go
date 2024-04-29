@@ -139,11 +139,11 @@ func main() {
 		DB:       redisConf.Db,
 	})
 
-    // languages := []redis.Z{
-    //     {Score: 123, Member: 89293},
-    // }
-    // fmt.Println(rds.ZAdd(ctx, redisConf.KeySourceTimestampTxt, languages...).Result())
-    // fmt.Println(rds.ZScore(ctx, redisConf.KeySourceTimestampTxt, fmt.Sprintf("%+v",89293)).Result())
+	// languages := []redis.Z{
+	//     {Score: 123, Member: 89293},
+	// }
+	// fmt.Println(rds.ZAdd(ctx, redisConf.KeySourceTimestampTxt, languages...).Result())
+	// fmt.Println(rds.ZScore(ctx, redisConf.KeySourceTimestampTxt, fmt.Sprintf("%+v",89293)).Result())
 
 	// 迭代extra表记录，查询redis，获取 like_score，source_timestamp
 	// 迭代获取数据
@@ -169,9 +169,9 @@ func main() {
 			key_timestamp := ""
 			key_like_score := ""
 
-            if items.ID != 89293{
-                continue
-            }
+			if items.ID != 89293 {
+				continue
+			}
 
 			switch items.ContentType {
 			case 1: // 图文
@@ -192,9 +192,9 @@ func main() {
 			}
 
 			// 取like_score
-            likeSocre, _ := rds.ZScore(ctx, key_like_score, fmt.Sprintf("%+v",items.ID)).Result()
+			likeSocre, _ := rds.ZScore(ctx, key_like_score, fmt.Sprintf("%+v", items.ID)).Result()
 			// 取source_timestamp
-			sourceTimstamp, _ := rds.ZScore(ctx, key_timestamp, fmt.Sprintf("%+v",items.ID)).Result()
+			sourceTimstamp, _ := rds.ZScore(ctx, key_timestamp, fmt.Sprintf("%+v", items.ID)).Result()
 
 			batchNewsLove = append(batchNewsLove, &model.NewsLove{
 				NewsID:          int32(items.ID),
@@ -215,7 +215,6 @@ func main() {
 	}
 
 }
-
 
 // SELECT * FROM `news_newsdataextra LIMIT 1000 OFFSET 343000
 // /data-local/go-awsome-tools/rio_redis_to_db/redis_to_db.go:156 SLOW SQL >= 200ms
