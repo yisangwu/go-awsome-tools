@@ -15,5 +15,5 @@ go run .\QuizeMasterImport.go -db_host="localhost" -db_user=admin -db_password=a
 go run .\QuizeMasterImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -genx=true
 
 注意:
-因直接从excel中导出格式CSV，因带有特殊字符，csv保存会有乱码。
-故导出格式为txt文件
+因直接从excel中导出格式CSV，因带有特殊字符。
+先另存为制表符分隔的txt文件，再在记事本中，另存为utf-8格式。

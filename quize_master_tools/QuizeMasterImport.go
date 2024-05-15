@@ -231,6 +231,11 @@ func main() {
 		fmt.Printf("Error! Connect database failed, err:%+v\r\n", err)
 		os.Exit(1)
 	}
+	
+	// 直接解析文件，生成json文件， 没有ID
+	// ParseQuizeFileToJson(file_name)
+	// fmt.Println("Successfully generated JSON file")
+
 	// 生成orm
 	// GenModel(conn, table)
 
@@ -254,9 +259,6 @@ func main() {
 	}
 	fmt.Println("Successfully batch written to db")
 
-	// // 生成json文件
-	// ParseQuizeFileToJson(file_name)
-	// fmt.Println("Successfully generated JSON file")
 
 	// 从DB题库表查询所有，并生成json文件
 	SelectFromTableMarshalToFile(conn)
