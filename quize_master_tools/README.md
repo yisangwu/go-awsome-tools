@@ -7,6 +7,9 @@
 
 直接运行代码：
 
+生成model，手动改表名，main调用
+go run .\QuizeMasterImport.go -db_host="192.168.1.222" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -genx=true
+
 分析文件导入DB并生成json文件：
 go run .\QuizeMasterImport.go -db_host="localhost" -db_user=admin -db_password=admin -database=quiz_master -table=question_bank -file_name="quize.txt"
 
