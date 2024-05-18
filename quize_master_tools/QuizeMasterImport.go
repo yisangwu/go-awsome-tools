@@ -245,18 +245,18 @@ func main() {
 	// 	return
 	// }
 
-	// //解析题库文件，并写入DB
-	// bluckModels := ParseQuizeFile(conn, file_name)
-	// if len(bluckModels) == 0 {
-	// 	fmt.Printf("ParseQuizeFile return empry, csv_file:%+v\r\n", file_name)
-	// 	return
-	// }
-	// result := conn.Create(bluckModels)
-	// if result.Error != nil {
-	// 	fmt.Printf("create result:%+v\r\n", result)
-	// 	return
-	// }
-	// fmt.Println("Successfully batch written to db")
+	//解析题库文件，并写入DB
+	bluckModels := ParseQuizeFile(conn, file_name)
+	if len(bluckModels) == 0 {
+		fmt.Printf("ParseQuizeFile return empry, csv_file:%+v\r\n", file_name)
+		return
+	}
+	result := conn.Create(bluckModels)
+	if result.Error != nil {
+		fmt.Printf("create result:%+v\r\n", result)
+		return
+	}
+	fmt.Println("Successfully batch written to db")
 
 
 	// 从DB题库表查询所有，并生成json文件
