@@ -1,0 +1,11 @@
+
+redis:
+  host: 10.10.0.9
+  port: 6379
+  db: 3
+
+key_pref:
+  key_pref_label_txt: Z_TXT_VIDEO_LABEL_WEIGHT_
+  key_pref_label_short_video: Z_SHORT_VIDEO_LABEL_WEIGHT_
+
+math_userid: 0
